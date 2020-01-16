@@ -11,7 +11,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     var nodeArray = [SCNNode]()
     
-    
     // MARK: Override Functions
     
     override func viewDidLoad() {
@@ -50,20 +49,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Pause the view's session
         sceneView.session.pause()
     }
-
-    // MARK: ARSCNViewDelegate Functions
-    
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        // Present an error message to the user
-    }
-    
-    func sessionWasInterrupted(_ session: ARSession) {
-        // Inform the user that the session has been interrupted, for example, by presenting an overlay
-    }
-    
-    func sessionInterruptionEnded(_ session: ARSession) {
-        // Reset tracking and/or remove existing anchors if consistent tracking is required
-    }
     
     // MARK: ARVisionBoard Functionality
     
@@ -71,7 +56,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let plane = SCNNode(geometry: SCNPlane(width: 0.2, height: 0.2))
         plane.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "rings")
         plane.geometry?.firstMaterial?.isDoubleSided = true;
-        plane.position = SCNVector3(0,0,0)
+        plane.position = SCNVector3Make(0,0,0)
         plane.name = "rings"
         sceneView.scene.rootNode.addChildNode(plane)
         nodeArray.append(plane)
@@ -85,27 +70,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         if let hitObject = hitList.first {
             let _ = hitObject.node
-            //print("\(node.name ?? "") was pressed")
             // remove node here
         }
     }
     
     @objc func onClickImageView(recogizer: UIPanGestureRecognizer) {
+        // for the recognizer
         let translation = recogizer.translation(in: self.view)
+        
+        // for the hit test
         let hits = sceneView.hitTest(translation, options: nil)
-        //print("enter function")
+        
         if !hits.isEmpty{
-            //print("hits is not empty")
-            let node = hits.first?.node
-            print("\(node?.name ?? "") was panned")
-            node?.position = SCNVector3(CGFloat((node?.position.x)!) + translation.x,
-                                        CGFloat((node?.position.y)!) + translation.y,
-                                        CGFloat((node?.position.z)!))
+            if let node = hits.first?.node {
+                node.position = SCNVector3(
+                    CGFloat(node.position.x) + round(translation.x / CGFloat(100.0)),
+                    CGFloat(node.position.y) + round(translation.x / CGFloat(100.0)),
+                    CGFloat(node.position.z))
+            }
         }
 //        if let view = recogizer.view {
 //            view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y + translation.y)
 //        }
 //        recogizer.setTranslation(CGPoint.zero, in: self.view)
+        //            print("*****************")
+        //            print(round(translation.x / CGFloat(100.0)))
+        //            print(round(translation.x / CGFloat(100.0)))
+        //            print("----------------")
+        //            print(node?.position.x ?? 0.0)
+        //            print(node?.position.y ?? 0.0)
+        //            print("*****************")
     }
        
        
@@ -116,8 +110,4 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 //           }
 //       }
        
-}
-
-struct PicNode {
-    
 }
